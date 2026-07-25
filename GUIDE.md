@@ -20,8 +20,16 @@
    içeriği benim aktarmam gerekiyor.
 3. Bu dosyada ilgili dersin bölümüne **kısa dijital not** al (kendi cümlelerinle).
 4. Öğrendiğini `tests/` altında yeni bir test dosyasına **koda dök**.
+   → **Ders 6'dan itibaren:** test dosyası bana **boşluklu** geliyor. Kritik
+   2-3 satır `# TODO(anıl):` olarak boş bırakılıyor, onları ben dolduruyorum.
+   Takılırsam cevabı soruyorum. *(Amaç: pasif okuyucu değil, yazan olmak.)*
 5. `pytest` ile çalıştır, yeşil olduğunu gör.
 6. Anlamlı bir commit at (aşağıdaki git bölümüne bak).
+
+> 📎 **HTML'i unuttuysan / hiç bilmiyorsan:** en alttaki
+> [Ek: Selenium için gereken kadar HTML](#-ek-selenium-için-gereken-kadar-html)
+> bölümünü oku. Selenium'un sisli gelmesinin sebebi genelde Selenium değil,
+> HTML boşluğudur.
 
 > 📁 **notlar/** klasörü: el yazısı notlarımın fotoğrafları/yazılı hali burada.
 > Kullanımı için `notlar/README.md` dosyasına bak.
@@ -385,3 +393,122 @@ git push
 ```
 > İyi commit mesajı = ilerlemenin görünür kanıtı. İşe alımcı repoya bakınca
 > düzenli çalıştığını görür.
+
+---
+
+## 📎 Ek: Selenium için gereken kadar HTML
+
+> Bu bölümü 2026-07-26'da ekledim. Sebebi: dersleri izlerken "teknik bilgim
+> eksik" hissi veren şey Selenium değil, **HTML boşluğuydu.** Selenium'un tek
+> yaptığı şey HTML'deki bir düğüme dokunmak — HTML'i görünce Selenium
+> kendiliğinden anlaşılıyor. Buraya *sadece Selenium için gereken kadarını*
+> yazdım, 10 dakikada okunur.
+
+### 1. Bir web sayfası aslında nedir?
+
+Tarayıcının indirdiği şey bir **metin dosyası**: HTML. İçinde iç içe geçmiş
+**etiketler** (tag) var. Tarayıcı bu metni okuyup ekrana çiziyor.
+
+```html
+<h2>Login Page</h2>
+<input type="text" id="username" name="username" class="form-input">
+<button type="submit">Login</button>
+```
+
+Sen ekranda "Login yazan mavi buton" görüyorsun; Selenium ise
+`<button type="submit">` satırını görüyor. **İkisi aynı şey.**
+
+### 2. Etiket anatomisi (buradaki 4 kelimeyi bilmek yeter)
+
+```
+<input type="text" id="username" class="form-input">  ...  </input>
+ └─┬─┘ └──────────────┬──────────────────────────┘
+   │                  │
+ETİKET ADI        ATTRIBUTE'LAR (özellikler)
+(tag name)        her biri  isim="değer"  şeklinde
+```
+
+| Terim | Ne demek | Selenium'daki karşılığı |
+|-------|----------|--------------------------|
+| **etiket adı** | Elementin türü: `input`, `button`, `a`, `h2`, `tr`, `td` | `By.TAG_NAME` |
+| **attribute** | Etikete yazılan `isim="değer"` çiftleri | `get_attribute("...")` |
+| **id** | Sayfada **tek** olması gereken kimlik | `By.ID` ← ilk tercih |
+| **class** | **Birden fazla** elementte olabilen etiket/grup | `By.CLASS_NAME`, CSS `.sinif` |
+| **text** | Etiketin **arasındaki** yazı: `<h2>BURASI</h2>` | `.text` |
+
+> 🔑 **id vs class:** id = TC kimlik numarası (tek kişide olur).
+> class = meslek (aynı meslekten yüzlerce kişi olabilir).
+> Bu yüzden id ile ararsan 1 element, class ile ararsan liste dönme ihtimali var.
+
+### 3. DOM ağacı — "içinde/içinde" mantığı
+
+Etiketler iç içe geçer. Bu iç içe yapıya **DOM ağacı** denir:
+
+```html
+<form id="login">                 <!-- ana kutu (parent) -->
+  <div class="row">               <!--   içindeki kutu -->
+    <label for="username">Username</label>
+    <input id="username">         <!--     en içteki element (child) -->
+  </div>
+</form>
+```
+
+Bu yüzden Ders 4'teki şu kalıp çalışıyor:
+```python
+satir = driver.find_element(By.XPATH, "//tr[td[text()='Iuvaret1']]")
+satir.find_element(By.LINK_TEXT, "edit").click()   # arama sadece o satırın İÇİNDE
+```
+Önce büyük kutuyu buluyorum, sonra **onun içinde** arıyorum. Tablolarda
+"doğru satırın butonuna basma" problemi böyle çözülüyor.
+
+### 4. Form elementleri (Ders 5'in tamamı bu)
+
+| HTML | Ne görünür | Selenium'da |
+|------|-----------|-------------|
+| `<input type="text">` | Yazı kutusu | `send_keys()`, `clear()`, `get_attribute("value")` |
+| `<input type="checkbox">` | Kutucuk | `click()`, `is_selected()` |
+| `<input type="radio">` | Yuvarlak seçenek | `click()`, `is_selected()` |
+| `<button>` | Buton | `click()` |
+| `<a href="...">` | Link | `click()`, `By.LINK_TEXT` |
+| `<select>` + `<option>` | Açılır liste | `Select(el).select_by_visible_text()` |
+| `<label>` | Alanın yanındaki yazı | genelde sadece okunur |
+
+**Açılır listenin gerçek hali:**
+```html
+<select id="dropdown">
+  <option value="" disabled selected>Please select an option</option>
+  <option value="1">Option 1</option>     <!-- value=makine için, "Option 1"=insan için -->
+  <option value="2">Option 2</option>
+</select>
+```
+`select_by_value("1")` → makine tarafını, `select_by_visible_text("Option 1")`
+→ insan tarafını kullanır. İkisi aynı seçeneği seçer.
+
+### 5. `.text` vs `value` — neden ikisi farklı?
+
+```html
+<h2>Login Page</h2>              <!-- yazı etiketin ARASINDA  -> .text -->
+<input id="username" value="">   <!-- yazı bir ATTRIBUTE'ta   -> get_attribute("value") -->
+```
+Kullanıcı input'a yazı yazdığında HTML kaynağı değişmez, elementin `value`'su
+değişir. Bu yüzden input'a `.text` dersen **boş string** alırsın.
+
+### 6. Tarayıcıda canlı görmek (en öğretici kısım)
+
+Herhangi bir sayfada **F12** → **Elements** sekmesi → bir öğeye sağ tık →
+**Inspect**. Ekranda gördüğün şeyin HTML karşılığı hemen vurgulanır.
+
+**Console** sekmesinde locator'ı Selenium'a yazmadan önce dene:
+```javascript
+$$("a.button")                     // CSS: kaç element eşleşti?
+$$("input[id^='user']")            // kısmi eşleşme tutuyor mu?
+$x("//tr[td[text()='Iuvaret1']]")  // XPath: doğru satırı buldu mu?
+```
+> Kural: **Selenium'a yazmadan önce konsolda test et.** En çok zaman
+> kazandıracak alışkanlık bu.
+
+### 7. Daha fazlası için
+
+- [MDN — HTML'e giriş (Türkçe)](https://developer.mozilla.org/tr/docs/Learn_web_development/Core/Structuring_content)
+- [W3Schools — HTML Forms](https://www.w3schools.com/html/html_forms.asp) (input/select/checkbox — bizim konumuz)
+- [MDN — CSS Selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_selectors)
