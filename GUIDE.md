@@ -15,7 +15,9 @@
 ## 🛠️ Nasıl Çalışıyoruz? (her ders için rutin)
 
 1. Dersi selenium.academy'de izle/oku.
-2. Kağıda elle notumu alırım → fotoğrafını `notlar/` klasörüne atarım.
+2. Ders sırasında kendi notumu alırım → **notlarımı doğrudan Claude'a yazarım**
+   (ders adı + ana başlıklar + gördüğüm kod). Site üye girişi istediği için
+   içeriği benim aktarmam gerekiyor.
 3. Bu dosyada ilgili dersin bölümüne **kısa dijital not** al (kendi cümlelerinle).
 4. Öğrendiğini `tests/` altında yeni bir test dosyasına **koda dök**.
 5. `pytest` ile çalıştır, yeşil olduğunu gör.
@@ -230,15 +232,11 @@ Bu bölüm senin isteğinle: aklıma yeni fikir geldikçe buraya ekliyorum.
 
 ## 🐙 Git / GitHub Akışı
 
-İlk kurulum (bir kez):
-```powershell
-cd "C:\Users\Anil Kavak\Desktop\selenium dersleri"
-git init
-git add .
-git commit -m "İlk kurulum: ortam + kurulum doğrulama testi"
-```
+✅ **Repo kuruldu** (2026-07-25). İlk iki commit atıldı:
+`Proje iskeleti...` → `Ders 1-3: kurulum, locator'lar ve çoklu tarayıcı desteği`.
+Bundan sonrası her ders için bir commit.
 
-GitHub'da `selenium-academy` adında boş bir repo açtıktan sonra:
+GitHub'da `selenium-academy` adında boş bir repo açtıktan sonra (henüz yapılmadı):
 ```powershell
 git remote add origin https://github.com/anllkvk/selenium-academy.git
 git branch -M main
