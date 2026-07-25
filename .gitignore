@@ -1,0 +1,21 @@
+# Sanal ortam
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Test çıktıları
+screenshots/*.png
+reports/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# İşletim sistemi
+Thumbs.db
+.DS_Store
