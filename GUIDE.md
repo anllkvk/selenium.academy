@@ -232,16 +232,9 @@ Bu bölüm senin isteğinle: aklıma yeni fikir geldikçe buraya ekliyorum.
 
 ## 🐙 Git / GitHub Akışı
 
-✅ **Repo kuruldu** (2026-07-25). İlk iki commit atıldı:
-`Proje iskeleti...` → `Ders 1-3: kurulum, locator'lar ve çoklu tarayıcı desteği`.
-Bundan sonrası her ders için bir commit.
-
-GitHub'da `selenium-academy` adında boş bir repo açtıktan sonra (henüz yapılmadı):
-```powershell
-git remote add origin https://github.com/anllkvk/selenium-academy.git
-git branch -M main
-git push -u origin main
-```
+✅ **Repo kuruldu ve GitHub'a yüklendi** (2026-07-25).
+Adres: <https://github.com/anllkvk/selenium.academy>
+Branch: `main` · Bundan sonrası her ders için bir commit.
 
 Her dersten sonra:
 ```powershell
