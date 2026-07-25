@@ -57,7 +57,8 @@ Ders işledikçe kutucukları `[x]` yapıyorum.
 - [x] İlk WebDriver testi — element bulma (find_element) ✅ *(ders_02_locators/test_locators.py)*
 - [~] Locator stratejileri (id, name, css, xpath) — başladık (id, link_text, css, tag_name)
 - [x] **WebDrivers Explained** — sürücüler, Options, headless, cross-browser ✅ *(ders_03_webdrivers/test_webdrivers.py)*
-- [ ] Bekleme (wait) türleri: implicit / explicit
+- [x] **Element Identification** — statik/dinamik elementler, kısmi eşleşme ✅ *(ders_04_element_bulma/test_element_bulma.py)*
+- [ ] Bekleme (wait) türleri: implicit / explicit ← **sıradaki**
 
 ### Bölüm 2 — Tarayıcı Etkileşimleri
 - [ ] **Cookies** — oluşturma, okuma, silme
@@ -200,7 +201,80 @@ kurulursa otomatik dahil olur).
 
 ---
 
-### Ders 4 — (bir sonraki dersi işleyince yazacağım)
+### Ders 4 — Element Identification (Elementleri Tanımlama) ✅
+**Tarih:** 2026-07-25
+**Kaynak:** [Ders sayfası](https://selenium.academy/selenium-identifying-elements/) ·
+[Yazılı hali](https://selenium.academy/selenium-identifying-elements-text-version/)
+
+Dersin üç başlığı: **Finding Elements / Static Elements / Dynamic Elements**.
+
+**Temel fikir (kendi cümlemle):**
+Selenium sayfayı benim gibi görmüyor. "Şu butona bas" diyemiyorum, "şu
+ADRESTEKİ elemente bas" dememem gerekiyor. **Locator = elementin adresi.**
+Elementi bulamazsa hiçbir şey yapamaz — o yüzden bu işin büyük kısmı
+locator yazmak.
+
+**1) Finding Elements — tekil vs çoğul**
+
+| | Bulursa | Bulamazsa |
+|---|---------|-----------|
+| `find_element` (tekil) | İLK eşleşeni verir | `NoSuchElementException` **fırlatır** |
+| `find_elements` (çoğul) | Liste verir | **Boş liste** döner, hata yok |
+
+> Kural: "var mı yok mu?" kontrolü yapacaksam çoğulunu kullanmalıyım.
+
+**2) Static Elements** — `id`/`name`'i her açılışta aynı kalan elementler.
+İşin kolay tarafı: `By.ID` yeter. (Login formundaki `username`, `password` gibi.)
+
+**3) Dynamic Elements** — dersin can alıcı noktası. İki ayrı anlamı var:
+- **a) id'si her yüklemede değişen elementler.** React/Angular'ın ürettiği
+  id'ler, oturum numaraları... Bunlara `By.ID` yazarsam testim yarın kırılır.
+  *Kanıtladım:* `challenging_dom` sayfasındaki butonun id'si iki yüklemede
+  `cf620bd0-...` → `d03e6840-...` oldu. **Çözüm: değişmeyene tutun** (class,
+  yapı, data-* attribute) veya **kısmi eşleşme** kullan.
+- **b) Sayfada sonradan beliren/kaybolan elementler.** Butona basınca 2 saniye
+  sonra gelen mesaj gibi. Şimdilik `implicitly_wait(5)` kurtarıyor;
+  doğru çözüm **explicit wait** → bir sonraki ders.
+
+**Kısmi eşleşme operatörleri (dinamik id'lerin ilacı):**
+
+| İstediğim | CSS | XPath |
+|-----------|-----|-------|
+| ile başlayan | `input[id^='user']` | `starts-with(@id,'user')` |
+| ile biten | `input[id$='name']` | — |
+| içeren | `input[id*='sernam']` | `contains(@id,'sernam')` |
+
+> Gerçek hayatta id'ler `user_input_8fa2b` gibi *sabit önek + rastgele son*
+> şeklinde olur; işte o zaman `^=` hayat kurtarır.
+
+**Locator seçme sırası (yukarıdan aşağı dene):**
+1. `id` — varsa ve **sabitse** her zaman birinci tercih
+2. `name` / `data-testid` — data-* attribute'ları zaten test için konur, çok sağlam
+3. **CSS selector** — hızlı, okunabilir (XPath'ten hızlı çalışır)
+4. `link text` — sadece `<a>` için, metin sabitse
+5. **XPath** — en güçlü (metne göre arama, yukarı çıkma) ama en kırılgan, son çare
+
+> ❌ **Asla:** mutlak XPath (`/html/body/div[2]/div/div[1]/form/input[3]`).
+> Sayfaya tek bir `<div>` eklenince kırılır.
+
+**En çok işime yarayacak kalıp — tabloda satır bulup o satırda işlem:**
+```python
+satir = driver.find_element(By.XPATH, "//tr[td[text()='Iuvaret1']]")
+satir.find_element(By.LINK_TEXT, "edit").click()   # arama SADECE o satırın içinde
+```
+Bir elementin üzerinden `find_element` çağırınca arama o elementin **içinde**
+yapılıyor. Bu, "doğru satırın butonuna basma" problemini çözüyor.
+
+**Kanıt kod:** `tests/ders_04_element_bulma/test_element_bulma.py` — 9 test, hepsi geçti.
+
+> **Satış notu (kendime):** Müşteriye → "Testlerin neden bazen kendiliğinden
+> bozulduğunu biliyor musunuz? Çoğu zaman sayfadaki elementlerin kimliği her
+> açılışta değiştiği içindir. Biz testleri değişmeyen özelliklere bağlayarak
+> yazıyoruz; siteniz güncellendiğinde testler ayakta kalıyor."
+
+---
+
+### Ders 5 — (bir sonraki dersi işleyince yazacağım)
 **Tarih:**
 
 **Öğrendiklerim:**

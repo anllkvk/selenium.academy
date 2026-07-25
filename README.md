@@ -42,8 +42,10 @@ selenium.academy/
 │   │   └── test_kurulum.py
 │   ├── ders_02_locators/    # Ders 2: locator'lar & etkileşim
 │   │   └── test_locators.py
-│   └── ders_03_webdrivers/  # Ders 3: sürücüler, options, cross-browser
-│       └── test_webdrivers.py
+│   ├── ders_03_webdrivers/  # Ders 3: sürücüler, options, cross-browser
+│   │   └── test_webdrivers.py
+│   └── ders_04_element_bulma/  # Ders 4: statik/dinamik element tanımlama
+│       └── test_element_bulma.py
 ├── pages/               # Page Object Model sınıfları (ileride)
 ├── screenshots/         # Test ekran görüntüleri
 ├── notlar/              # Ders notlarının dijital hali
@@ -75,7 +77,8 @@ Test başarısız olursa ekran görüntüleri artifact olarak yüklenir.
 | 1 | Development Setup (ortam kurulumu) | ✅ |
 | 2 | Locator'lar & ilk WebDriver etkileşimi | ✅ |
 | 3 | WebDrivers Explained (options, headless, cross-browser) | ✅ |
-| 4 | Bekleme (wait) türleri: implicit / explicit | ⏳ |
+| 4 | Element Identification (statik / dinamik elementler) | ✅ |
+| 5 | Bekleme (wait) türleri: implicit / explicit | ⏳ |
 | 5 | Cookies (oluştur/oku/sil) | ⏳ |
 | 6 | Screenshots | ⏳ |
 | 7 | Page Object Model & Design Patterns | ⏳ |
