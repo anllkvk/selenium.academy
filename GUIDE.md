@@ -58,6 +58,7 @@ Ders işledikçe kutucukları `[x]` yapıyorum.
 - [~] Locator stratejileri (id, name, css, xpath) — başladık (id, link_text, css, tag_name)
 - [x] **WebDrivers Explained** — sürücüler, Options, headless, cross-browser ✅ *(ders_03_webdrivers/test_webdrivers.py)*
 - [x] **Element Identification** — statik/dinamik elementler, kısmi eşleşme ✅ *(ders_04_element_bulma/test_element_bulma.py)*
+- [x] **Element Interaction** — tıklama, yazma, checkbox, dropdown ✅ *(ders_05_etkilesim/test_etkilesim.py)*
 - [ ] Bekleme (wait) türleri: implicit / explicit ← **sıradaki**
 
 ### Bölüm 2 — Tarayıcı Etkileşimleri
@@ -274,7 +275,70 @@ yapılıyor. Bu, "doğru satırın butonuna basma" problemini çözüyor.
 
 ---
 
-### Ders 5 — (bir sonraki dersi işleyince yazacağım)
+### Ders 5 — Element Interaction (Elementlerle Etkileşim) ✅
+**Tarih:** 2026-07-26
+**Kaynak:** [Ders sayfası](https://selenium.academy/selenium-element-interaction/)
+
+**Ders notum:** Selenium kullanarak sayfa elemanlarıyla nasıl etkileşim
+kurarız — dersin dört başlığı: **Clicking / Text input / Checkbox / ComboBox**.
+
+**Önceki derse bağlantısı:** Ders 4 "elementi nasıl BULURUM" idi, bu ders
+"bulduktan sonra NE YAPARIM". Selenium'un tamamı aslında bu iki adım:
+**bul → etkileşime gir.**
+
+**1) Clicking** — `click()`. Kritik nokta: tıklama sayfayı **değiştirir**.
+Tıkladıktan sonra elementleri **yeniden sorgulamak** gerekir, eski listeyle
+devam edilemez.
+
+**2) Text input** — `send_keys()` yazıyı **ekler**, üzerine yazmaz.
+Var olan değeri değiştireceksem önce `clear()`.
+> `anilkavak` gibi birbirine yapışmış değerler hep bu yüzden oluşuyor.
+
+**3) Checkbox** — `click()` bir anahtar değil **toggle**. İşaretliyse kaldırır.
+Doğru yöntem "tıkla" demek değil, **"şu duruma getir"** demek:
+```python
+if kutu.is_selected() != istenen_durum:
+    kutu.click()
+```
+
+**4) ComboBox** — `<select>` için özel yardımcı: **`Select` sınıfı**.
+`select_by_visible_text()` / `select_by_value()` / `select_by_index()`.
+Tercihim visible_text: sayfa değişince en az kırılan ve testi okuyan kişi
+ne seçildiğini anlıyor.
+
+**Takıldığım/öğrendiğim iki kritik ayrım:**
+
+| | Ne verir | Ne zaman |
+|---|---|---|
+| `.text` | Etiketin **arasındaki** yazı | `<h2>Login Page</h2>` |
+| `.get_attribute("value")` | Input'un **içindeki** değer | `<input value="tomsmith">` |
+
+> Input'a `.text` dersem **boş string** alırım. "Neden çalışmıyor" krizlerinin
+> klasik sebebi bu.
+
+| Metot | Sorusu |
+|---|---|
+| `is_displayed()` | Ekranda görünüyor mu? |
+| `is_enabled()` | Aktif/tıklanabilir mi? (gri değil mi) |
+| `is_selected()` | İşaretli mi? (sadece checkbox/radio) |
+
+**Etkileşim komutları özeti:**
+`click()` · `send_keys("yazı")` · `send_keys(Keys.RETURN)` · `clear()` ·
+`submit()` · `.text` · `get_attribute("value")` · `is_displayed()` ·
+`is_enabled()` · `is_selected()` · `Select(el)`
+
+**Kanıt kod:** `tests/ders_05_etkilesim/test_etkilesim.py` — 9 test, hepsi geçti.
+Testlerin ikisi bilinçli olarak **tuzağı gösteriyor**: `clear()` olmadan yazınca
+değerlerin yapışması ve checkbox'a körlemesine tıklayınca durumun ters dönmesi.
+
+> **Satış notu (kendime):** Müşteriye → "Bir kullanıcının yapabildiği her şeyi
+> otomatik yapabiliyoruz: form doldurma, kutucuk işaretleme, liste seçimi.
+> Sipariş formunuzun 20 farklı kombinasyonunu her sürümde dakikalar içinde
+> deniyoruz — manuel olarak kimsenin yapmaya vakti olmayan şey bu."
+
+---
+
+### Ders 6 — (bir sonraki dersi işleyince yazacağım)
 **Tarih:**
 
 **Öğrendiklerim:**
