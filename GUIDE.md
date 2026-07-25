@@ -223,8 +223,11 @@ Bu bölüm senin isteğinle: aklıma yeni fikir geldikçe buraya ekliyorum.
   seni ayrıştırır.
 - **HTML rapor:** İleride `pytest-html` ekleyip güzel test raporu üretebiliriz
   (LinkedIn/GitHub'da göstermek için görsel malzeme).
-- **CI otomasyonu:** Repo GitHub'a gidince GitHub Actions ile her push'ta
-  testleri otomatik çalıştırırız — CV'de "CI/CD" maddesi olur.
+- ~~**CI otomasyonu:**~~ ✅ **Yapıldı (2026-07-25).** GitHub Actions her push'ta
+  testleri Ubuntu sunucusunda Chrome + Edge ile headless çalıştırıyor
+  (`.github/workflows/tests.yml`). README'de yeşil/kırmızı rozet var.
+  CV/LinkedIn'de "CI/CD (GitHub Actions)" maddesi artık gerçek bir kanıta dayanıyor.
+  *Not: Bölüm 6'daki Jenkins/TeamCity derslerini işlerken bu deneyim işine yarayacak.*
 - **Page Object Model klasörü:** `pages/` klasörü POM dersinde devreye girecek.
 - **Sertifika kanıtı:** Sertifikayı alınca `docs/` altına ekle, README'de göster.
 

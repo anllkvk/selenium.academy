@@ -13,12 +13,26 @@ Bu derste öğrendiğimiz üç şey:
     pytest tests/ders_03_webdrivers --browser=edge -v
     pytest tests/ders_03_webdrivers --headless -v
 """
+import os
+
 import pytest
 
 from conftest import driver_olustur, tarayici_kurulu_mu
 
-# Bu makinede kurulu olan tarayıcılar (Firefox yoksa otomatik elenir).
-MEVCUT_TARAYICILAR = [t for t in ("chrome", "edge", "firefox") if tarayici_kurulu_mu(t)]
+# Hangi tarayıcıları deneyeceğiz? Varsayılan: üçü de.
+# SELENIUM_TARAYICILAR ortam değişkeniyle sınırlandırılabilir (CI'da kullanıyoruz):
+#     SELENIUM_TARAYICILAR=chrome,edge
+_adaylar = os.getenv("SELENIUM_TARAYICILAR", "chrome,edge,firefox")
+ADAY_TARAYICILAR = [t.strip().lower() for t in _adaylar.split(",") if t.strip()]
+
+# Bu makinede gerçekten kurulu olanlar (Firefox yoksa otomatik elenir).
+MEVCUT_TARAYICILAR = [t for t in ADAY_TARAYICILAR if tarayici_kurulu_mu(t)]
+
+# Hiçbiri bulunamazsa parametrize boş kalır ve test sessizce yok olur —
+# bunu istemiyoruz, o yüzden chrome'a düşüp testin gürültülü şekilde
+# başarısız olmasını sağlıyoruz.
+if not MEVCUT_TARAYICILAR:
+    MEVCUT_TARAYICILAR = ["chrome"]
 
 HEDEF = "https://the-internet.herokuapp.com/"
 

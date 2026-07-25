@@ -1,5 +1,7 @@
 # Selenium Academy — Test Otomasyonu Öğrenme Projesi
 
+[![Selenium Testleri](https://github.com/anllkvk/selenium.academy/actions/workflows/tests.yml/badge.svg)](https://github.com/anllkvk/selenium.academy/actions/workflows/tests.yml)
+
 [selenium.academy](https://selenium.academy/) eğitimini takip ederken, her
 dersi Python + Selenium ile **çalışan test koduna** çevirdiğim uygulamalı repo.
 
@@ -58,6 +60,13 @@ pytest --headless            # tarayıcı penceresi açmadan (CI modu)
 pytest -m crossbrowser       # sadece cross-browser testleri
 pytest -m smoke              # hızlı temel testler
 ```
+
+## 🔄 Sürekli Entegrasyon (CI)
+
+Her `main` push'unda testler GitHub Actions üzerinde bir Ubuntu sunucusunda
+**Chrome ve Edge ile headless** olarak otomatik çalışır —
+bkz. [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
+Test başarısız olursa ekran görüntüleri artifact olarak yüklenir.
 
 ## 📚 İşlenen Konular
 

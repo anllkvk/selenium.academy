@@ -1,0 +1,58 @@
+# Selenium testlerini her push'ta otomatik çalıştırır (Continuous Integration).
+#
+# Neden önemli? Kodu GitHub'a her gönderdiğimde, benim bilgisayarım kapalı olsa
+# bile testler bulutta bir Linux sunucusunda çalışır. Bir şey bozulursa
+# commit'in yanında kırmızı ✗ görürüm. Bu, eğitimin "CI" bölümünün pratiği.
+#
+# Tarayıcılar sunucuda ekransız (headless) çalışır — bu yüzden `--headless`.
+
+name: Selenium Testleri
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: # GitHub arayüzünden elle de çalıştırabilirim
+
+jobs:
+  test:
+    name: pytest (Chrome + Edge, headless)
+    runs-on: ubuntu-latest
+
+    env:
+      # GitHub'ın Ubuntu sunucusunda Chrome ve Edge hazır kurulu geliyor.
+      # Firefox'u dışarıda bırakıyoruz (sunucuda snap paketi olarak geldiği
+      # için geckodriver ile sorun çıkarabiliyor).
+      SELENIUM_TARAYICILAR: chrome,edge
+
+    steps:
+      - name: Kodu çek
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Bağımlılıkları yükle
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Kurulu tarayıcıları göster
+        run: |
+          google-chrome --version || echo "Chrome yok"
+          microsoft-edge --version || echo "Edge yok"
+
+      - name: Testleri çalıştır
+        run: pytest --headless
+
+      - name: Hata anındaki ekran görüntülerini sakla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ekran-goruntuleri
+          path: screenshots/
+          if-no-files-found: ignore

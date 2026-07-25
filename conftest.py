@@ -14,6 +14,7 @@ komut satırından seçiyoruz:
     pytest --headless               # tarayıcıyı görünmez modda çalıştır (CI için)
 """
 import os
+import sys
 import shutil
 import datetime
 import pytest
@@ -46,7 +47,19 @@ def pytest_addoption(parser):
 
 
 def tarayici_kurulu_mu(tarayici: str) -> bool:
-    """Bu makinede ilgili tarayıcı var mı? (Yoksa testi atlamak için kullanıyoruz.)"""
+    """
+    Bu makinede ilgili tarayıcı var mı? (Yoksa testi atlamak için kullanıyoruz.)
+
+    Hem Windows (kendi bilgisayarım) hem Linux (GitHub Actions sunucusu) için
+    çalışır — CI'da tarayıcıların adı farklı (google-chrome, microsoft-edge).
+    """
+    # PATH'te aranacak çalıştırılabilir dosya adları
+    komutlar = {
+        "chrome": ["chrome", "google-chrome", "google-chrome-stable", "chromium"],
+        "edge": ["msedge", "microsoft-edge", "microsoft-edge-stable"],
+        "firefox": ["firefox", "firefox-esr"],
+    }
+    # Windows'ta tarayıcılar PATH'te olmayabilir; bilinen kurulum yollarına da bak
     yollar = {
         "chrome": [
             r"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -61,10 +74,20 @@ def tarayici_kurulu_mu(tarayici: str) -> bool:
             r"C:\Program Files (x86)\Mozilla Firefox\firefox.exe",
         ],
     }
-    exe_adi = {"chrome": "chrome", "edge": "msedge", "firefox": "firefox"}[tarayici]
-    if shutil.which(exe_adi):
+    if any(shutil.which(k) for k in komutlar[tarayici]):
         return True
     return any(os.path.exists(y) for y in yollar[tarayici])
+
+
+def _linux_ci_argumanlari(options) -> None:
+    """
+    Linux sunucularda (GitHub Actions) Chromium tabanlı tarayıcılar root olarak
+    ve kısıtlı /dev/shm ile çalıştığı için bu iki argüman olmadan açılmaz.
+    Windows'ta gereksiz olduğu için sadece Linux'ta ekliyoruz.
+    """
+    if sys.platform.startswith("linux"):
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
 
 
 def driver_olustur(tarayici: str = "chrome", headless: bool = False):
@@ -92,6 +115,7 @@ def driver_olustur(tarayici: str = "chrome", headless: bool = False):
         if headless:
             options.add_argument("--headless=new")
             options.add_argument("--window-size=1920,1080")
+            _linux_ci_argumanlari(options)
         drv = webdriver.Chrome(options=options)
 
     elif tarayici == "edge":
@@ -102,6 +126,7 @@ def driver_olustur(tarayici: str = "chrome", headless: bool = False):
         if headless:
             options.add_argument("--headless=new")
             options.add_argument("--window-size=1920,1080")
+            _linux_ci_argumanlari(options)
         drv = webdriver.Edge(options=options)
 
     else:  # firefox
